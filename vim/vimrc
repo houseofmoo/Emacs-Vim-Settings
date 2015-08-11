@@ -1,0 +1,165 @@
+" School server settings:
+" Disable YouCompleteMe plugin, and path
+" Disable colorcolumn
+" Diable indentLine plugin, causes performance issues - fix placed in vimrc
+" Turn off TagList, since it needs ctags installed
+" Updated 5-15-2015
+
+" tagslist - :TlistOpen
+" nerdtree - :NERDTree
+
+set nocompatible
+
+
+" Vundle
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'gmarik/Vundle.vim'                  " vundle
+"Plugin 'altercation/vim-colors-solarized'  " solarized theme
+Plugin 'bling/vim-airline'                  " prettier status bar
+"Plugin 'Raimondi/delimitMate'              " autobracket
+"Plugin 'tpope/vim-sensible'                " universal set of defaults
+Plugin 'Yggdroot/indentLine'                " indent guides - this is causing lag
+Plugin 'scrooloose/nerdtree'                " filesystem gui
+Plugin 'jpo/vim-railscasts-theme'           " railscasts color scheme
+Plugin 'tpope/vim-surround'                 " surround
+Plugin 'Valloric/YouCompleteMe'             " auto completion
+call vundle#end()
+filetype plugin indent on
+"filetype indent on
+
+"Taglist searches for tags
+set tags=./tags;/
+
+" This mostly fixes indentLine's lag issues - keep an eye on it
+let g:indentLine_faster=1
+
+" leaderkey
+let mapleader = ","
+
+" Spacing and Indents
+set expandtab                               " spaces instead of tabs
+set smarttab                                " tabs and BS are smart
+set shiftwidth=4                            " how many spaces indent is
+set tabstop=4                               " tab = 4 spaces
+set softtabstop=4
+set autoindent                              " auto indent
+set smartindent                             " smart indent
+set cindent                                 " better indents for c
+set nowrap                                  " defaults to no line wraps
+set showbreak=->                            " if Wrap on, shows -> at breaklines
+set list                                    " shows tabs and spaces
+set colorcolumn=80                          " column 80 is light up
+set backspace=indent,eol,start
+set listchars=tab:>~,nbsp:_,trail:.
+let g:indentLine_color_term=1
+"if has("autocmd")
+"  filetype plugin indent on
+"endif
+
+" Buffers
+nnoremap  <silent>   <tab>  :if &modifiable && !&readonly && &modified <CR> :write<CR> :endif<CR>:bnext<CR>
+nnoremap  <silent> <s-tab>  :if &modifiable && !&readonly && &modified <CR> :write<CR> :endif<CR>:bprevious<CR>
+
+" Set wrap, linebreak, nolist, and showbreak
+command! -nargs=* YesWrap set wrap linebreak nolist 
+command! -nargs=* NoWrap set nowrap nolinebreak list
+
+" Styling
+syntax on                                   " syntax highlighting
+set background=dark                         " dark background
+colorscheme railscasts
+
+" Autocomments off
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+highlight Comment ctermfg=darkgrey
+
+" Searching
+set hlsearch                                " highlight searches
+set ignorecase                              " case insensitive matching
+set smartcase                               " smart case matching
+set incsearch                               " incremental search
+set hidden                                  " hidden buffers when abandoned
+
+" UI
+set number                                  " line numbers
+set cursorline                              " show cursor line
+set ruler                                   " current position
+set showcmd                                 " show command in status line
+set showmatch                               " show matching brackets
+set mouse=a                                 " enables mouse usage
+"set autowrite                              " auto save before commands like :next and :make
+set laststatus=2                            " always show status line
+let &t_SI = "\<Esc>]50;CursorShape=1\x7"    " changes cursor to line on insert mode
+let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+let g:airline#extensions#tabline#enabled=1  " see buffers on status bar
+
+" NERDTree options
+let NERDTreeWinSize=27                      " NERDTree window size
+let NERDTreeShowLineNumbers=2               " shows line numbers in NERDTree
+
+" Movement
+map j gj
+map k gk
+imap jk <Esc><Esc>
+imap jj <Esc>l
+nmap <C-K> O<Esc>j                          " C-K/C-J add new lines
+nmap <C-J> o<Esc>k
+inoremap {<CR> {<CR>}<C-o>O
+map Y y$                                    " Copy to end of line
+
+" Leader-zz turns scrolloff on/off
+nnoremap <Leader>zz :let &scrolloff=999-&scrolloff<CR>
+
+" Drag Visual Plugin
+runtime ~/.vim/plugin/dragvisuals.vim
+vmap  <expr>  <LEFT>   DVB_Drag('left')
+vmap  <expr>  <RIGHT>  DVB_Drag('right')
+vmap  <expr>  <DOWN>   DVB_Drag('down')
+vmap  <expr>  <UP>     DVB_Drag('up')
+vmap  <expr>  D        DVB_Duplicate()
+let g:DVB_TrimWS = 1                        " removes trailing white space
+
+" Remove trailing white space
+autocmd BufWritePre *.h,*.c,*.java,*.cpp :call <SID>StripTrailingWhitespaces()
+function! <SID>StripTrailingWhitespaces()
+    let l = line(".")
+    let c = col(".")
+    %s/\s\+$//e
+    call cursor(l, c)
+endfun
+
+" vmath
+runtime ~/.vim/plugin/vmath.vim
+vmap <expr>  ++  VMATH_YankAndAnalyse()
+nmap         ++  vip++
+
+" Folding, F9 handles all the folding
+"augroup vimrc
+"    au BufReadPre * setlocal foldmethod=indent
+"    au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+"augroup END
+"set foldminlines=5                         " indent mode wont autofold blocks with less than 5 lines
+set foldmethod=manual                       " folding is set to manual
+set foldcolumn=2                            " fold column shows 2 bars
+inoremap <F9> <C-O>za
+nnoremap <F9> za
+onoremap <F9> <C-C>za
+vnoremap <F9> zf
+" turning off view files, so folds will not save
+"autocmd BufWinLeave *.* mkview
+"autocmd BufWinEnter *.* silent loadview
+
+" YouCompleteMe
+let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
+" YCM Black list
+let g:ycm_filetype_blacklist = {'asm' : 0}
+" Change swap/backup dir
+set backupdir=~/.vim/backup/
+set directory=~/.vim/swap/
+" make vim and os clipboard the same
+set clipboard^=unnamed
+
+

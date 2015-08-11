@@ -1,0 +1,1 @@
+This is my vim set up, that I am saving here on github because I am tired of constantly having to copy it over from my main machine to my laptop. I hope this works out the way I think it will work. Wish me luck.
